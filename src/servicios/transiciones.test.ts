@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ESTADOS_SOLICITUD, type EstadoSolicitud } from "@/modelos/esquema";
+import { ESTADOS_SOLICITUD, type EstadoSolicitud } from "@/modelos/catalogos";
 import { ErrorNegocio } from "./errores";
 import { puedeTransicionar, transicionesPermitidas, validarTransicion } from "./transiciones";
 

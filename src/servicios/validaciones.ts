@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ESTADOS_SOLICITUD, PRIORIDADES } from "@/modelos/esquema";
+import { ESTADOS_SOLICITUD, PRIORIDADES } from "@/modelos/catalogos";
 import { errorValidacion } from "./errores";
 
 const textoObligatorio = (campo: string, minimo: number, maximo: number) =>

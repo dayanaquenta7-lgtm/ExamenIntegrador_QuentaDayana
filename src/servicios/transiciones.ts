@@ -1,4 +1,4 @@
-import type { EstadoSolicitud } from "@/modelos/esquema";
+import type { EstadoSolicitud } from "@/modelos/catalogos";
 import { conflicto } from "./errores";
 
 /** Máquina de estados: RESUELTA y CANCELADA son finales. */

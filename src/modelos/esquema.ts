@@ -11,13 +11,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
-export const ESTADOS_EQUIPO = ["OPERATIVO", "EN_MANTENIMIENTO", "FUERA_DE_SERVICIO"] as const;
-export const PRIORIDADES = ["BAJA", "MEDIA", "ALTA"] as const;
-export const ESTADOS_SOLICITUD = ["PENDIENTE", "EN_PROCESO", "RESUELTA", "CANCELADA"] as const;
+import type { EstadoEquipo, EstadoSolicitud, Prioridad } from "./catalogos";
 
-export type EstadoEquipo = (typeof ESTADOS_EQUIPO)[number];
-export type Prioridad = (typeof PRIORIDADES)[number];
-export type EstadoSolicitud = (typeof ESTADOS_SOLICITUD)[number];
+export * from "./catalogos";
 
 export const equipos = pgTable(
   "equipos",
