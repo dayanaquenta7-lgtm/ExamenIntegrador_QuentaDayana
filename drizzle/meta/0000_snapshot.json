@@ -1,0 +1,223 @@
+{
+  "id": "29f445b8-15aa-40ff-a6c9-8a010da6214a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.equipos": {
+      "name": "equipos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "codigo": {
+          "name": "codigo",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ubicacion": {
+          "name": "ubicacion",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'OPERATIVO'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "equipos_codigo_unique": {
+          "name": "equipos_codigo_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "codigo"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "equipos_estado_check": {
+          "name": "equipos_estado_check",
+          "value": "\"equipos\".\"estado\" IN ('OPERATIVO', 'EN_MANTENIMIENTO', 'FUERA_DE_SERVICIO')"
+        }
+      },
+      "isRLSEnabled": true
+    },
+    "public.solicitudes": {
+      "name": "solicitudes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "codigo_solicitud": {
+          "name": "codigo_solicitud",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "equipo_id": {
+          "name": "equipo_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "solicitante": {
+          "name": "solicitante",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prioridad": {
+          "name": "prioridad",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(12)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDIENTE'"
+        },
+        "fecha_registro": {
+          "name": "fecha_registro",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "fecha_actualizacion": {
+          "name": "fecha_actualizacion",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "activo": {
+          "name": "activo",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        }
+      },
+      "indexes": {
+        "solicitudes_fecha_registro_idx": {
+          "name": "solicitudes_fecha_registro_idx",
+          "columns": [
+            {
+              "expression": "fecha_registro",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "solicitudes_equipo_id_idx": {
+          "name": "solicitudes_equipo_id_idx",
+          "columns": [
+            {
+              "expression": "equipo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "solicitudes_equipo_id_equipos_id_fk": {
+          "name": "solicitudes_equipo_id_equipos_id_fk",
+          "tableFrom": "solicitudes",
+          "tableTo": "equipos",
+          "columnsFrom": [
+            "equipo_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "solicitudes_codigo_solicitud_unique": {
+          "name": "solicitudes_codigo_solicitud_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "codigo_solicitud"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "solicitudes_prioridad_check": {
+          "name": "solicitudes_prioridad_check",
+          "value": "\"solicitudes\".\"prioridad\" IN ('BAJA', 'MEDIA', 'ALTA')"
+        },
+        "solicitudes_estado_check": {
+          "name": "solicitudes_estado_check",
+          "value": "\"solicitudes\".\"estado\" IN ('PENDIENTE', 'EN_PROCESO', 'RESUELTA', 'CANCELADA')"
+        },
+        "solicitudes_solicitante_check": {
+          "name": "solicitudes_solicitante_check",
+          "value": "char_length(btrim(\"solicitudes\".\"solicitante\")) >= 3"
+        },
+        "solicitudes_descripcion_check": {
+          "name": "solicitudes_descripcion_check",
+          "value": "char_length(btrim(\"solicitudes\".\"descripcion\")) >= 10"
+        }
+      },
+      "isRLSEnabled": true
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
