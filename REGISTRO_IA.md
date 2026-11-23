@@ -1,0 +1,6 @@
+# Registro de uso de IA — LabCare
+
+| # | Herramienta | Prompt resumido | Sugerencia de la IA | Cambio realizado | Cómo se verificó |
+|---|---|---|---|---|---|
+| 1 | Claude Code (Claude Opus 5.5) | Enunciado completo del examen: crear LabCare (Next.js + Drizzle + Zod + Vitest, arquitectura MVC/API), reglas de negocio, interfaz, pruebas, documentación y Git. Pedir plan antes de ejecutar. | Plan de 7 fases (inicio, BD, servicios con TDD, API, vista, pruebas CP, documentación). Propuso Docker para PostgreSQL y una matriz de casos tentativa. | Se aprobó el plan con cambios: Supabase en lugar de Docker, matriz oficial CP-01 a CP-12 más CP-13/CP-14 extra, verificar que la carpeta no esté dentro de otro repo, despliegue en Vercel. | Revisión del plan por la estudiante antes de ejecutar. |
+| 2 | Claude Code | Fase 0: inicializar repositorio y proyecto. | `git rev-parse --show-toplevel` (falló: no hay repo padre), `git init`, rama `examen/quenta-dayana`, create-next-app, dependencias. Subir `@types/node` a 24 por conflicto de peer con Vitest 5. | Proyecto creado; `.gitignore` con `.env*` y excepción `!.env.example`. | `git check-ignore -v` confirmó que `.env.local` se ignora y `.env.example` no. |
