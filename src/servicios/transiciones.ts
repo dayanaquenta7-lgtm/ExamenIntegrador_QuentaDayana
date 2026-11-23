@@ -17,6 +17,13 @@ export function puedeTransicionar(desde: EstadoSolicitud, hacia: EstadoSolicitud
   return TRANSICIONES[desde].includes(hacia);
 }
 
+/** Una solicitud en estado final (sin transiciones posibles) ya no se puede editar. */
+export const esEditable = (estado: EstadoSolicitud) => TRANSICIONES[estado].length > 0;
+
+export function validarEditable(estado: EstadoSolicitud): void {
+  if (!esEditable(estado)) throw conflicto("No se puede editar una solicitud resuelta o cancelada");
+}
+
 export function validarTransicion(desde: EstadoSolicitud, hacia: EstadoSolicitud): void {
   if (puedeTransicionar(desde, hacia)) return;
   const permitidas = TRANSICIONES[desde];

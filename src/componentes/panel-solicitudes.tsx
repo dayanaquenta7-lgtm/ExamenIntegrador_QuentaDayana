@@ -172,7 +172,15 @@ export function PanelSolicitudes() {
                   <td className="px-2 py-2">
                     <div className="flex flex-wrap justify-end gap-1">
                       <button type="button" className={claseBoton.enlace} onClick={() => abrir("detalle", s.id)}>Ver</button>
-                      <button type="button" className={claseBoton.enlace} onClick={() => abrir("editar", s.id)}>Editar</button>
+                      <button
+                        type="button"
+                        className={claseBoton.enlace}
+                        onClick={() => abrir("editar", s.id)}
+                        disabled={!s.editable}
+                        title={!s.editable ? "Una solicitud resuelta o cancelada no se puede editar" : undefined}
+                      >
+                        Editar
+                      </button>
                       <button
                         type="button"
                         className={claseBoton.enlace}
@@ -220,7 +228,7 @@ export function PanelSolicitudes() {
                 avisar({ tipo: "exito", texto: `Solicitud ${r.datos.codigoSolicitud} actualizada.` });
                 cerrar();
                 void recargar();
-              } else if (r.status === 404) {
+              } else if (r.status === 404 || r.status === 409) {
                 avisar({ tipo: "error", texto: r.error });
                 cerrar();
                 void recargar();

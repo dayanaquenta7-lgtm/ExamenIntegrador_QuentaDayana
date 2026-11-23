@@ -3,7 +3,7 @@ import type { BaseDatos } from "@/modelos/db";
 import { equipos, solicitudes, type EstadoSolicitud, type Prioridad } from "@/modelos/esquema";
 import { conReintento, fechaParaCodigo, generarCodigo, prefijoDelDia } from "./codigo";
 import { errorValidacion, esViolacionUnica, noEncontrado } from "./errores";
-import { transicionesPermitidas, validarTransicion } from "./transiciones";
+import { esEditable, transicionesPermitidas, validarEditable, validarTransicion } from "./transiciones";
 import {
   escaparLike,
   esquemaCambioEstado,
@@ -26,6 +26,7 @@ export interface SolicitudDTO {
   fechaActualizacion: string;
   equipo: { id: number; codigo: string; nombre: string; ubicacion: string };
   transicionesPermitidas: EstadoSolicitud[];
+  editable: boolean;
 }
 
 const columnasSolicitud = {
@@ -57,6 +58,7 @@ function aDTO(fila: FilaSolicitud): SolicitudDTO {
     fechaRegistro: fila.fechaRegistro.toISOString(),
     fechaActualizacion: fila.fechaActualizacion.toISOString(),
     transicionesPermitidas: transicionesPermitidas(fila.estado),
+    editable: esEditable(fila.estado),
   };
 }
 
@@ -169,11 +171,13 @@ export async function actualizarSolicitud(db: BaseDatos, id: number, cuerpo: unk
 
   await db.transaction(async (tx) => {
     const [actual] = await tx
-      .select({ equipoId: solicitudes.equipoId })
+      .select({ equipoId: solicitudes.equipoId, estado: solicitudes.estado })
       .from(solicitudes)
       .where(and(eq(solicitudes.id, id), eq(solicitudes.activo, true)))
       .for("update");
     if (!actual) throw noEncontrado();
+
+    validarEditable(actual.estado); // RESUELTA y CANCELADA no se editan (409).
 
     // Solo se exige OPERATIVO si se cambia de equipo: mantener el equipo actual siempre es válido.
     if (actual.equipoId !== datos.equipoId) await exigirEquipoOperativo(tx, datos.equipoId);

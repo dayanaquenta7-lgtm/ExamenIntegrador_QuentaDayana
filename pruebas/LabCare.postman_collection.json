@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "LabCare — Solicitudes de mantenimiento",
-    "description": "Casos CP-01 a CP-14 del examen integrador. Ejecutar en orden con el Collection Runner: los casos encadenan ids mediante variables de colección. Cambiar baseUrl para probar en Vercel.",
+    "description": "Casos CP-01 a CP-15 del examen integrador. Ejecutar en orden con el Collection Runner: los casos encadenan ids mediante variables de colección. Cambiar baseUrl para probar en Vercel.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -1180,6 +1180,88 @@
                 "api",
                 "solicitudes",
                 "-1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "CP-15: Editar una solicitud en estado final (RESUELTA o CANCELADA)",
+      "description": "Se rechaza con 409 y la solicitud no cambia. Usa la solicitud de CP-01, que quedó RESUELTA en CP-08.",
+      "item": [
+        {
+          "name": "CP-15a PUT solicitud RESUELTA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"mensaje exacto\", () => pm.expect(pm.response.json().error).to.eql(\"No se puede editar una solicitud resuelta o cancelada\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/solicitudes/{{idSolicitud}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "solicitudes",
+                "{{idSolicitud}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"equipoId\": 1,\n  \"solicitante\": \"Intento de edición\",\n  \"descripcion\": \"El equipo no enciende al presionar el botón.\",\n  \"prioridad\": \"ALTA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "CP-15b GET la solicitud no cambió",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json();",
+                  "pm.test(\"sigue RESUELTA y no editable\", () => { pm.expect(s.estado).to.eql(\"RESUELTA\"); pm.expect(s.editable).to.eql(false); });",
+                  "pm.test(\"solicitante sin cambios\", () => pm.expect(s.solicitante).to.not.eql(\"Intento de edición\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/solicitudes/{{idSolicitud}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "solicitudes",
+                "{{idSolicitud}}"
               ]
             }
           }

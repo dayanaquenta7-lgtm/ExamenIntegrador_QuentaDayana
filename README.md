@@ -13,7 +13,7 @@ Examen integrador de Desarrollo de Sistemas II. Autora: Dayana Quenta.
 | Base de datos | PostgreSQL (Supabase) |
 | ORM / migraciones | Drizzle ORM + drizzle-kit, driver `postgres` |
 | Validación | Zod 4 |
-| Pruebas | Vitest (unitarias), script de API (CP-01 a CP-14), colección Postman |
+| Pruebas | Vitest (unitarias), script de API (CP-01 a CP-15), colección Postman |
 | Despliegue | Vercel |
 
 ## Arquitectura (MVC / API)
@@ -65,7 +65,7 @@ npm run lint        # ESLint
 npm run typecheck   # TypeScript
 npm test            # Vitest: validaciones, código y transiciones
 npm run build       # build de producción
-npm run pruebas:cp  # con el servidor levantado: ejecuta CP-01 a CP-14 y regenera PRUEBAS.md
+npm run pruebas:cp  # con el servidor levantado: ejecuta CP-01 a CP-15 y regenera PRUEBAS.md
 ```
 
 ## Despliegue en Vercel
@@ -84,7 +84,7 @@ npm run pruebas:cp  # con el servidor levantado: ejecuta CP-01 a CP-14 y regener
 - Listado con código, equipo, solicitante, prioridad, estado y fecha, ordenado del más reciente al más antiguo.
 - Búsqueda sin distinguir mayúsculas por código, solicitante o equipo. Los caracteres `%` y `_` se buscan como texto literal.
 - Filtros por prioridad y estado.
-- Ver detalle, editar, cambiar estado (solo ofrece las transiciones permitidas y muestra la advertencia del servidor si la rechaza) y eliminar con confirmación (eliminación lógica).
+- Ver detalle, editar (deshabilitado para solicitudes resueltas o canceladas; el servidor responde 409), cambiar estado (solo ofrece las transiciones permitidas y muestra la advertencia del servidor si la rechaza) y eliminar con confirmación (eliminación lógica).
 - Mensajes de éxito solo después de la respuesta del servidor; botones deshabilitados mientras se envía.
 
 ## Endpoints
@@ -95,7 +95,7 @@ npm run pruebas:cp  # con el servidor levantado: ejecuta CP-01 a CP-14 y regener
 | GET | `/api/solicitudes?q=&prioridad=&estado=` | Listado activo con búsqueda y filtros | 200, 400 |
 | POST | `/api/solicitudes` | Registrar solicitud | 201, 400 |
 | GET | `/api/solicitudes/{id}` | Detalle | 200, 404 |
-| PUT | `/api/solicitudes/{id}` | Editar (equipo, solicitante, descripción, prioridad) | 200, 400, 404 |
+| PUT | `/api/solicitudes/{id}` | Editar (equipo, solicitante, descripción, prioridad); 409 si está RESUELTA o CANCELADA | 200, 400, 404, 409 |
 | DELETE | `/api/solicitudes/{id}` | Eliminación lógica | 200, 404 |
 | PATCH | `/api/solicitudes/{id}/estado` | Cambiar estado `{ "estado": "EN_PROCESO" }` | 200, 400, 404, 409 |
 
@@ -117,5 +117,5 @@ Ejemplo de error de validación (400):
 ## Documentación
 
 - [ANALISIS.md](ANALISIS.md): actor, problema, alcance, RF, reglas de negocio, casos de uso y diagrama C4.
-- [PRUEBAS.md](PRUEBAS.md): resultados reales de CP-01 a CP-14.
+- [PRUEBAS.md](PRUEBAS.md): resultados reales de CP-01 a CP-15.
 - [REGISTRO_IA.md](REGISTRO_IA.md): uso de herramientas de IA.

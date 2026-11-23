@@ -1,4 +1,4 @@
-// Ejecuta los casos CP-01 a CP-14 contra el servidor y escribe PRUEBAS.md con el resultado REAL.
+// Ejecuta los casos CP-01 a CP-15 contra el servidor y escribe PRUEBAS.md con el resultado REAL.
 // Uso: npm run dev (en otra terminal) y luego `npm run pruebas:cp`. BASE_URL opcional (p. ej. la URL de Vercel).
 import { writeFileSync } from "node:fs";
 import postgres from "postgres";
@@ -277,6 +277,30 @@ await caso("CP-14", "ID inválido en la ruta (extra)", "Responde 404 sin error i
   const malJson = await fetch(`${API}/solicitudes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{malo" });
   ev.push(`POST con JSON mal formado → ${malJson.status}`);
   v(malJson.status === 400, "JSON mal formado → 400");
+});
+
+await caso("CP-15", "Editar una solicitud en estado final (RESUELTA o CANCELADA)", "Se rechaza con 409 y la solicitud no cambia.", async (v, ev) => {
+  const edicion = valida({ equipoId: 4, solicitante: "Intento de edición", prioridad: "ALTA" });
+
+  const antes = (await http("GET", `/solicitudes/${ctx.id1}`)).json;
+  v(antes.estado === "RESUELTA", `preparación: ${antes.codigoSolicitud} está RESUELTA (desde CP-08)`);
+  const r = await http("PUT", `/solicitudes/${ctx.id1}`, edicion);
+  ev.push(`PUT /api/solicitudes/${ctx.id1} (RESUELTA) → ${resumen(r)}`);
+  v(r.status === 409, "HTTP 409");
+  v(r.json?.error === "No se puede editar una solicitud resuelta o cancelada", "mensaje exacto del servidor");
+  const despues = (await http("GET", `/solicitudes/${ctx.id1}`)).json;
+  v(JSON.stringify(despues) === JSON.stringify(antes), "la solicitud RESUELTA no cambió");
+
+  const c = await http("POST", "/solicitudes", valida({ solicitante: `Para cancelar ${marca}` }));
+  const cancelada = await http("PATCH", `/solicitudes/${c.json.id}/estado`, { estado: "CANCELADA" });
+  v(cancelada.status === 200 && cancelada.json.estado === "CANCELADA", "preparación: solicitud nueva pasada a CANCELADA");
+  v(cancelada.json.editable === false, "la API la marca editable = false (la interfaz deshabilita Editar)");
+  const r2 = await http("PUT", `/solicitudes/${c.json.id}`, edicion);
+  ev.push(`PUT /api/solicitudes/${c.json.id} (CANCELADA) → ${resumen(r2)}`);
+  v(r2.status === 409 && r2.json?.error === "No se puede editar una solicitud resuelta o cancelada", "CANCELADA también responde 409 con el mismo mensaje");
+  const despues2 = (await http("GET", `/solicitudes/${c.json.id}`)).json;
+  v(despues2.solicitante === c.json.solicitante && despues2.prioridad === c.json.prioridad, "la solicitud CANCELADA no cambió");
+  ctx.id15 = c.json.id;
 });
 
 // Limpieza: las solicitudes de prueba quedan eliminadas lógicamente (nunca se borran físicamente).

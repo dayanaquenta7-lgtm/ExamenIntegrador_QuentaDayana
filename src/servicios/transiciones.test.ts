@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ESTADOS_SOLICITUD, type EstadoSolicitud } from "@/modelos/catalogos";
 import { ErrorNegocio } from "./errores";
-import { puedeTransicionar, transicionesPermitidas, validarTransicion } from "./transiciones";
+import { esEditable, puedeTransicionar, transicionesPermitidas, validarEditable, validarTransicion } from "./transiciones";
 
 const VALIDAS: [EstadoSolicitud, EstadoSolicitud][] = [
   ["PENDIENTE", "EN_PROCESO"],
@@ -42,6 +42,23 @@ describe("transiciones de estado", () => {
   it("RESUELTA y CANCELADA son estados finales", () => {
     expect(transicionesPermitidas("RESUELTA")).toEqual([]);
     expect(transicionesPermitidas("CANCELADA")).toEqual([]);
+  });
+
+  it.each(["RESUELTA", "CANCELADA"] as const)("no permite editar una solicitud %s (409)", (estado) => {
+    expect(esEditable(estado)).toBe(false);
+    try {
+      validarEditable(estado);
+      expect.unreachable("debió lanzar");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ErrorNegocio);
+      expect((e as ErrorNegocio).status).toBe(409);
+      expect((e as ErrorNegocio).message).toBe("No se puede editar una solicitud resuelta o cancelada");
+    }
+  });
+
+  it.each(["PENDIENTE", "EN_PROCESO"] as const)("permite editar una solicitud %s", (estado) => {
+    expect(esEditable(estado)).toBe(true);
+    expect(() => validarEditable(estado)).not.toThrow();
   });
 
   it("lista las transiciones ofrecidas a la interfaz", () => {

@@ -30,7 +30,7 @@ Las fallas de los equipos se reportan de forma verbal, por mensajes o en papel. 
 | RF-05 | Buscar sin distinguir mayúsculas por código, solicitante o nombre del equipo. |
 | RF-06 | Filtrar el listado por prioridad y por estado. |
 | RF-07 | Consultar el detalle de una solicitud. |
-| RF-08 | Editar equipo, solicitante, descripción y prioridad de una solicitud (nunca id, código, estado, fecha de registro ni activo). |
+| RF-08 | Editar equipo, solicitante, descripción y prioridad de una solicitud no finalizada (nunca id, código, estado, fecha de registro ni activo). |
 | RF-09 | Cambiar el estado respetando las transiciones permitidas. |
 | RF-10 | Eliminar lógicamente una solicitud (activo = false), con confirmación. |
 
@@ -48,6 +48,7 @@ Las fallas de los equipos se reportan de forma verbal, por mensajes o en papel. 
 | RN-08 | La edición solo cambia campos permitidos y actualiza `fecha_actualizacion`. | `actualizarSolicitud` (lista blanca explícita) |
 | RN-09 | Eliminación lógica; una solicitud inactiva responde 404 y no aparece en el listado. | `eliminarSolicitud` / filtros `activo = true` |
 | RN-10 | Respuestas: 200/201, 400 con mensajes por campo, 404, 409, 500 genérico sin detalles. | `src/app/api/_lib/http.ts` (`manejarError`) |
+| RN-11 | Una solicitud RESUELTA o CANCELADA no se puede editar: 409 "No se puede editar una solicitud resuelta o cancelada". La interfaz deshabilita "Editar". | `validarEditable` en `src/servicios/transiciones.ts`, usada en `actualizarSolicitud` (con `FOR UPDATE`) |
 
 La interfaz también limita opciones (por ejemplo, solo ofrece las transiciones permitidas), pero **toda regla se valida en el backend**: la vista es solo una ayuda.
 
@@ -118,6 +119,6 @@ flowchart TB
 | GET | `/api/solicitudes?q=&prioridad=&estado=` | Listado activo con búsqueda y filtros | 200, 400 |
 | POST | `/api/solicitudes` | Registrar | 201, 400 |
 | GET | `/api/solicitudes/{id}` | Detalle | 200, 404 |
-| PUT | `/api/solicitudes/{id}` | Editar | 200, 400, 404 |
+| PUT | `/api/solicitudes/{id}` | Editar (no en estado final) | 200, 400, 404, 409 |
 | DELETE | `/api/solicitudes/{id}` | Eliminación lógica | 200, 404 |
 | PATCH | `/api/solicitudes/{id}/estado` | Cambiar estado | 200, 400, 404, 409 |
